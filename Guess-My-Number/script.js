@@ -36,11 +36,13 @@ document.querySelector('.check').addEventListener('click', function () {
         displayMessage('score', score);
         displayMessage('guess', null);
         score--;
+        document.querySelector('.guess').value = null;
     } else if (guess < secretNumber) {
         displayMessage('message', 'Too low');
         displayMessage('score', score);
         displayMessage('guess', null);
         score--;
+        document.querySelector('.guess').value = null;
     } else { //win game - correct number (guess === secretNumber)
         displayMessage('message', 'Correct number! 🎈');
         displayMessage('number', secretNumber);
