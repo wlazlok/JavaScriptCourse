@@ -60,7 +60,11 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
-
+const modalErrorWindow = document.querySelector('.modal');
+const overlay = document.querySelector('.overlay');
+const buttonClose = document.querySelector('.close-modal');
+const modalTitleMsg = document.querySelector('#title-msg');
+const modalMsg = document.querySelector('#err-msg');
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -85,7 +89,7 @@ const displayMovements = function (movements) {
   })
 }
 
-displayMovements(account1.movements);
+//displayMovements(account1.movements);
 
 const createUsernames = function (acc) {
   acc.forEach(acc => {
@@ -101,9 +105,9 @@ const calcAndDisplayBalance = function (movements) {
   const balance = movements.reduce((acc, mov) => acc += mov);
   labelBalance.textContent = `${balance}€`;
 }
-calcAndDisplayBalance(account1.movements);
+//calcAndDisplayBalance(account1.movements);
 
-const calcAndDisplaySummary = function (movements) {
+const calcAndDisplaySummary = function (movements, intrestRate) {
   const inserts = movements
     .filter(mov => mov > 0)
     .reduce((cur, mov) => cur += mov);
@@ -116,12 +120,58 @@ const calcAndDisplaySummary = function (movements) {
 
   const interest = movements
     .filter(mov => mov > 0)
-    .map(deposit => (deposit * 1.2) / 100)
+    .map(deposit => (deposit * intrestRate) / 100)
     .filter(int => int >= 1)
     .reduce((acc, curr) => acc += curr);
   labelSumInterest.textContent = `${interest}€`;
 }
-calcAndDisplaySummary(account1.movements);
+//calcAndDisplaySummary(account1.movements);
+
+const closeModalWindow = function () {
+  modalErrorWindow.classList.add('hidden');
+  overlay.classList.add('hidden');
+}
+
+buttonClose.addEventListener('click', closeModalWindow);
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && !modalErrorWindow.classList.contains('hidden')) {
+    closeModalWindow();
+  }
+});
+overlay.addEventListener('click', closeModalWindow);
+
+// Events hendler
+let loggedUser;
+
+btnLogin.addEventListener('click', function (event) {
+  event.preventDefault(); // prefent form from submiting
+
+  loggedUser = accounts.find(acc => (acc.username === inputLoginUsername.value &&
+    acc.pin === Number(inputLoginPin.value)));
+
+  if (loggedUser != null) {
+    // Clear input fields
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Display UI and message
+    labelWelcome.textContent = `Welcome back ${loggedUser.owner.split(' ')[0]}!`;
+    containerApp.style.opacity = 100;
+
+    // Display movements/balance/summary
+    displayMovements(loggedUser.movements);
+    calcAndDisplayBalance(loggedUser.movements);
+    calcAndDisplaySummary(loggedUser.movements, loggedUser.interestRate);
+  } else {
+    modalErrorWindow.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+    modalTitleMsg.textContent = 'Error during loggin!';
+    modalMsg.textContent = 'Invalid username or PIN. Please try again 😀';
+    modalMsg.style.fontSize = '40px';
+  }
+})
+
 /////////////////////////////////////////////////
 
 // LECTURE
@@ -209,3 +259,10 @@ console.log(balance);*/
   .map(mov => mov * 1.1)
   .reduce((acc, mov) => acc += mov);
 console.log(balnceEurToUsd + '$');*/
+
+// Find method
+/*const value = movements.find(mov => mov < 0);
+console.log(value);
+
+const account = accounts.find(acc => acc.username === 'js');
+console.log(account);*/
