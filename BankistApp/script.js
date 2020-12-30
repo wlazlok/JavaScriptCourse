@@ -155,6 +155,10 @@ btnLogin.addEventListener('click', function (event) {
     inputLoginPin.value = '';
     inputLoginPin.blur();
 
+    // Set up current date
+    const now = new Date();
+    labelDate.textContent = `As of ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+
     // Display UI and message
     labelWelcome.textContent = `Welcome back ${loggedUser.owner.split(' ')[0]}!`;
     containerApp.style.opacity = 100;
