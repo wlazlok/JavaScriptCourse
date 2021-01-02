@@ -101,12 +101,12 @@ const createUsernames = function (acc) {
 }
 createUsernames(accounts);
 
-const calcAndDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc += mov);
+const calcAndDisplayBalance = function (acc) {
+  const balance = acc.movements.reduce((acc, mov) => acc += mov);
   labelBalance.textContent = `${balance}€`;
+  acc.balance = balance;
 }
 //calcAndDisplayBalance(account1.movements);
-
 const calcAndDisplaySummary = function (movements, intrestRate) {
   const inserts = movements
     .filter(mov => mov > 0)
@@ -126,10 +126,23 @@ const calcAndDisplaySummary = function (movements, intrestRate) {
   labelSumInterest.textContent = `${interest}€`;
 }
 //calcAndDisplaySummary(account1.movements);
-
 const closeModalWindow = function () {
   modalErrorWindow.classList.add('hidden');
   overlay.classList.add('hidden');
+}
+// create and show modal window
+const createAndShowModal = function (title, msg) {
+  modalErrorWindow.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+  modalTitleMsg.textContent = title;
+  modalMsg.textContent = msg;
+  modalMsg.style.fontSize = '40px';
+}
+// update UI for current user
+const updateUI = function (usr) {
+  displayMovements(usr.movements);
+  calcAndDisplayBalance(usr);
+  calcAndDisplaySummary(usr.movements, usr.interestRate);
 }
 
 buttonClose.addEventListener('click', closeModalWindow);
@@ -164,15 +177,39 @@ btnLogin.addEventListener('click', function (event) {
     containerApp.style.opacity = 100;
 
     // Display movements/balance/summary
-    displayMovements(loggedUser.movements);
-    calcAndDisplayBalance(loggedUser.movements);
-    calcAndDisplaySummary(loggedUser.movements, loggedUser.interestRate);
+    updateUI(loggedUser);
   } else {
-    modalErrorWindow.classList.remove('hidden');
-    overlay.classList.remove('hidden');
-    modalTitleMsg.textContent = 'Error during loggin!';
-    modalMsg.textContent = 'Invalid username or PIN. Please try again 😀';
-    modalMsg.style.fontSize = '40px';
+    createAndShowModal('Error during loggin!', 'Invalid username or PIN. Please try again 😀');
+  }
+})
+
+//transfer
+btnTransfer.addEventListener('click', function (event) {
+  event.preventDefault();
+  const amount = inputTransferAmount.value ? Number(inputTransferAmount.value) : null;
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
+  if (amount > 0 && loggedUser.balance >= amount && receiverAcc != null) {
+    loggedUser.movements.push(-amount);
+    createAndShowModal(loggedUser);
+    receiverAcc.movements.push(amount);
+    updateUI(loggedUser);
+    //clear inoput fields
+    inputTransferAmount.value = null;
+    inputTransferTo.value = null;
+    createAndShowModal('Information', 'Money transfered succesfully 😀');
+  } else if (receiverAcc == null) {
+    createAndShowModal('Error!', 'Receiver account does not exists!');
+    inputTransferAmount.value = null;
+    inputTransferTo.value = null;
+  } else if (amount < 0 || loggedUser.balance < amount) {
+    createAndShowModal('Error!', 'You dont have enough money');
+    inputTransferAmount.value = null;
+    inputTransferTo.value = null;
+  }
+  else if (amount == null) {
+    createAndShowModal('Error!', 'Please insert amount to transfer');
+    inputTransferAmount.value = null;
+    inputTransferTo.value = null;
   }
 })
 
