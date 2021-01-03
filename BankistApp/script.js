@@ -234,6 +234,23 @@ btnClose.addEventListener('click', function (event) {
   }
 })
 
+//loan function
+btnLoan.addEventListener('click', function (event) {
+  event.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 && loggedUser.movements.some(mov => mov >= amount * 0.1)) {
+    //add movement
+    loggedUser.movements.push(amount);
+    console.log(loggedUser.movements);
+    //update UI
+    updateUI(loggedUser);
+    //cleare inputs
+    inputLoanAmount.value = null;
+  } else {
+    createAndShowModal('Error!', 'You want to loan too much money');
+    inputLoanAmount.value = null;
+  }
+})
 /////////////////////////////////////////////////
 
 // LECTURE
@@ -328,3 +345,14 @@ console.log(value);
 
 const account = accounts.find(acc => acc.username === 'js');
 console.log(account);*/
+
+// some and very
+/*console.log(movements);
+// equality
+console.log(movements.includes(-130));
+// condition
+const anyDeposits = movements.some(mov => mov > 5000);
+console.log(anyDeposits);*/
+//every -- if every element pass the "fucntion"
+//console.log(movements.every(mov => mov > 0));
+//console.log(account4.movements.every(mov => mov > 0));
