@@ -212,6 +212,27 @@ btnTransfer.addEventListener('click', function (event) {
     inputTransferTo.value = null;
   }
 })
+//close acc
+btnClose.addEventListener('click', function (event) {
+  event.preventDefault();
+  if (inputCloseUsername.value === loggedUser.username && Number(inputClosePin.value) === loggedUser.pin) {
+    const index = accounts.findIndex(acc => acc.username === loggedUser.username);
+    // delete current acc
+    accounts.splice(index, 1);
+    //show modal
+    createAndShowModal('Inforamtion', 'Your account has been removed!');
+    //hide UI
+    containerApp.style.opacity = 0;
+    //clear inputs
+    inputCloseUsername.value = null;
+    inputClosePin.value = null;
+  } else {
+    createAndShowModal('Error!', 'Invalid account credentials!');
+    //clear inputs
+    inputCloseUsername.value = null;
+    inputClosePin.value = null;
+  }
+})
 
 /////////////////////////////////////////////////
 
