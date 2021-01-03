@@ -223,6 +223,7 @@ btnClose.addEventListener('click', function (event) {
     createAndShowModal('Inforamtion', 'Your account has been removed!');
     //hide UI
     containerApp.style.opacity = 0;
+    labelWelcome.textContent = 'Log in to get started';
     //clear inputs
     inputCloseUsername.value = null;
     inputClosePin.value = null;
