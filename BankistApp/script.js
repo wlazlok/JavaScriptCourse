@@ -417,11 +417,23 @@ movements.sort((a, b) => {
 console.log(movements);*/
 
 // creating and filling arrays
+/*const x = [1, 2, 3, 4, 5, 6, 7];
 const arr = new Array(7);
 console.log(arr);
 
 // arr.fill(1);
 // console.log(arr);
+// arr.fill(1, 3);
+// console.log(arr);
 
-arr.fill(1, 3);
-console.log(arr);
+const y = Array.from({ length: 7 }, () => 1);
+console.log(y);
+
+const z = Array.from({ length: 7 }, (_, i) => i + 1);
+console.log(z);
+
+labelBalance.addEventListener('click', function (event) {
+  event.preventDefault();
+  const movementUI = Array.from(document.querySelectorAll('.movements__value'), el => Number(el.textContent));
+  console.log(movementUI);
+})*/
