@@ -256,16 +256,10 @@ btnLoan.addEventListener('click', function (event) {
 //sorting function
 let movs = false;
 const sortDesc = function (usr) {
-  return usr.movements.slice().sort((a, b) => {
-    if (a > b) return 1;
-    if (b > a) return -1;
-  });
+  return usr.movements.slice().sort((a, b) => a - b);
 }
 const sortAsc = function (usr) {
-  return usr.movements.slice().sort((a, b) => {
-    if (a > b) return -1;
-    if (b > a) return 1;
-  });
+  return usr.movements.slice().sort((a, b) => b - a);
 }
 btnSort.addEventListener('click', function (event) {
   event.preventDefault();
@@ -421,3 +415,13 @@ movements.sort((a, b) => {
   }
 })
 console.log(movements);*/
+
+// creating and filling arrays
+const arr = new Array(7);
+console.log(arr);
+
+// arr.fill(1);
+// console.log(arr);
+
+arr.fill(1, 3);
+console.log(arr);
