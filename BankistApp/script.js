@@ -170,7 +170,7 @@ btnLogin.addEventListener('click', function (event) {
 
     // Set up current date
     const now = new Date();
-    labelDate.textContent = `As of ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+    labelDate.textContent = `As of ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}, ${now.getHours()}:${now.getMinutes()}`;
 
     // Display UI and message
     labelWelcome.textContent = `Welcome back ${loggedUser.owner.split(' ')[0]}!`;
@@ -251,6 +251,26 @@ btnLoan.addEventListener('click', function (event) {
     createAndShowModal('Error!', 'You want to loan too much money');
     inputLoanAmount.value = null;
   }
+})
+
+//sorting function
+let movs = false;
+const sortDesc = function (usr) {
+  return usr.movements.slice().sort((a, b) => {
+    if (a > b) return 1;
+    if (b > a) return -1;
+  });
+}
+const sortAsc = function (usr) {
+  return usr.movements.slice().sort((a, b) => {
+    if (a > b) return -1;
+    if (b > a) return 1;
+  });
+}
+btnSort.addEventListener('click', function (event) {
+  event.preventDefault();
+  movs ? displayMovements(sortDesc(loggedUser)) : displayMovements(sortAsc(loggedUser));
+  movs = movs ? false : true;
 })
 /////////////////////////////////////////////////
 
@@ -357,3 +377,47 @@ console.log(anyDeposits);*/
 //every -- if every element pass the "fucntion"
 //console.log(movements.every(mov => mov > 0));
 //console.log(account4.movements.every(mov => mov > 0));
+
+// lat and flatMap
+/*const arr = [[1, 2, 3], [4, 5, 6], 7, 8];
+console.log(arr.flat());
+const arrDeep = [[[1, 2], 3], [4, [5, 6]], 7, 8];
+console.log(arrDeep.flat(2)); //depth level
+
+const accountMov = accounts.map(acc => acc.movements);
+console.log(accountMov);
+const allMov = accountMov.flat();
+console.log(allMov);
+const overall = allMov.reduce((acc, curr) => acc + curr, 0);
+//console.log(overall);
+
+//flat
+const overallBalance = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((acc, curr) => acc + curr, 0);
+console.log(overallBalance);
+//flatMap
+const overallBalance2 = accounts
+  .flatMap(acc => acc.movements) //only 1 level depth
+  .reduce((acc, curr) => acc + curr, 0);
+console.log(overallBalance2);*/
+
+// sorting arrays
+
+// string
+/*const owners = ['Karol', 'Marcin', 'Adam', 'Szymon'];
+console.log(owners.sort());
+// numbers
+console.log(movements);
+
+// return < 0 => A, B
+// return > 0 => B, A
+movements.sort((a, b) => {
+  if (a > b) {
+    return 1
+  } else if (b > a) {
+    return -1;
+  }
+})
+console.log(movements);*/
