@@ -1,7 +1,4 @@
 'use strict';
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 // BANKIST APP
 
 // Data
@@ -101,8 +98,6 @@ const modalTitleMsg = document.querySelector('#title-msg');
 const modalMsg = document.querySelector('#err-msg');
 
 const locale = navigator.language;
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 // LECTURES
 
 const currencies = new Map([
@@ -148,13 +143,18 @@ const displayMovements = function (movements, dates, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(dates[i]);
     const displayDate = formatMovementsDate(date);
+    const formattedMov = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(mov);
+
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type} ">
         ${i + 1} ${type}
         </div> 
         ${displayDate}
-        <div class="movements__value">${mov.toFixed(2)}€</div>
+        <div class="movements__value">${formattedMov}</div>
       </div>
     `;
 
@@ -163,7 +163,6 @@ const displayMovements = function (movements, dates, sort = false) {
 };
 
 //displayMovements(account1.movements);
-
 const createUsernames = function (acc) {
   acc.forEach(acc => {
     acc.username = acc.owner.toLowerCase()
@@ -176,19 +175,33 @@ createUsernames(accounts);
 //calcAndDisplayBalance(account1.movements);
 const calcAndDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
+  const formattedBalance = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(acc.balance);
+
+  labelBalance.textContent = `${formattedBalance}`;
 };
+
+const formattedSummary = function (value) {
+  const formatted = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(value);
+
+  return formatted;
+}
 
 const calcAndDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
+  labelSumIn.textContent = `${formattedSummary(incomes)}`;
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
+  labelSumOut.textContent = `${formattedSummary(out).substr(1)}`;
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -198,7 +211,7 @@ const calcAndDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
+  labelSumInterest.textContent = `${formattedSummary(interest)}`;
 };
 //calcAndDisplaySummary(account1.movements);
 const closeModalWindow = function () {
@@ -229,8 +242,36 @@ document.addEventListener('keydown', function (e) {
 overlay.addEventListener('click', closeModalWindow);
 
 // Events hendler
-let loggedUser;
+let loggedUser, timer;
 
+// Timer
+const startLogOutTimer = function () {
+  const tick = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, '0');
+    const sec = String(time % 60).padStart(2, '0');
+    if (time === 0) {
+      clearInterval(timer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Log in to get started`;
+      createAndShowModal("You have been loged out!")
+      loggedUser = null;
+    } else {
+      labelTimer.textContent = `${min}:${sec}`;
+      time--;
+    }
+  }
+  let time = 120;
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+}
+// restart timer
+const restartTimer = function () {
+  clearInterval(timer);
+  timer = startLogOutTimer();
+}
+
+//login
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault(); // prefent form from submiting
 
@@ -250,6 +291,10 @@ btnLogin.addEventListener('click', function (event) {
     // Display UI and message
     labelWelcome.textContent = `Welcome back ${loggedUser.owner.split(' ')[0]}!`;
     containerApp.style.opacity = 100;
+
+    // Start timer or stop if logged to other acc
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
 
     // Display movements/balance/summary
     updateUI(loggedUser);
@@ -288,6 +333,8 @@ btnTransfer.addEventListener('click', function (event) {
     inputTransferAmount.value = null;
     inputTransferTo.value = null;
   }
+  // reset timer;
+  restartTimer();
 })
 //close acc
 btnClose.addEventListener('click', function (event) {
@@ -310,6 +357,8 @@ btnClose.addEventListener('click', function (event) {
     inputCloseUsername.value = null;
     inputClosePin.value = null;
   }
+  // reset timer;
+  restartTimer();
 })
 
 //loan function
@@ -318,17 +367,21 @@ btnLoan.addEventListener('click', function (event) {
   const amount = Number(inputLoanAmount.value);
   if (amount > 0 && loggedUser.movements.some(mov => mov >= amount * 0.1)) {
     //add movement
-    loggedUser.movements.push(amount);
-    loggedUser.movementsDates.push(new Date);
-    console.log(loggedUser.movements);
-    //update UI
-    updateUI(loggedUser);
-    //cleare inputs
-    inputLoanAmount.value = null;
+    setTimeout(function () {
+      loggedUser.movements.push(amount);
+      loggedUser.movementsDates.push(new Date);
+      console.log(loggedUser.movements);
+      //update UI
+      updateUI(loggedUser);
+      //cleare inputs
+      inputLoanAmount.value = null;
+    }, 2500)
   } else {
     createAndShowModal('Error!', 'You want to loan too much money');
     inputLoanAmount.value = null;
   }
+  // reset timer;
+  restartTimer();
 })
 
 //sorting function
@@ -522,3 +575,28 @@ labelBalance.addEventListener('click', function (event) {
 const calcDaysPassed = (date1, date2) => Math.abs((date2 - date1) / (1000 * 60 * 60 * 24));
 let days = calcDaysPassed(new Date(2037, 10, 10), new Date(2037, 10, 20));
 console.log(days);*/
+
+//Formating numbers
+/*const num = 5444.32;
+const options = {
+  style: 'currency', //unit, percent
+  unit: 'celsius',
+  currency: 'EUR',
+  // useGrouping: false
+}
+
+console.log(new Intl.NumberFormat('pl-PL', options).format(num));*/
+
+// Timers
+/*const ing = ['olives', 'test1'];
+const timer = setTimeout((ing, ing1) => console.log(`Here is your pizza: ${ ing } ${ ing1 } `), 3000, ...ing);
+
+if (ing.includes('olives')) {
+  clearTimeout(timer);
+}
+
+//setTimeout
+setInterval(function () {
+  const date = new Date();
+  console.log(date);
+}, 10000)*/
