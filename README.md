@@ -4,6 +4,7 @@
 * [Dice-Game](https://wlazlok.github.io/JavaScriptCourse/Dice-Game/)
 * [Modal](https://wlazlok.github.io/JavaScriptCourse/Modal/)
 * [Bankist App](https://wlazlok.github.io/JavaScriptCourse/BankistApp/)
+* [Bankist Website](https://wlazlok.github.io/JavaScriptCourse/BankistWebsite/)
 > Example login and PIN for Bankist App
 <pre>
 Login     PIN
